@@ -1,0 +1,17 @@
+{
+  "hash": "208fa38b2df0c9351e18353b7d17e480",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: Get to Know Me\nformat: \n  html: \n    grid: \n      body-width: 900px\nabout:\n  template: broadside\n  image: Self.jpg\n  links: \n    - icon: linkedin\n      text: Linkedin\n      href: https://www.linkedin.com/in/mitchelgreer/\n    - icon: github\n      text: Github\n      href: https://github.com/MoneyMG\n    - icon: envelope\n      text: Email\n      href: mailto::magreer@ualberta.ca\n---\n\n\n\n\n\n\nIt is not enough to know the labels of the things that interest us. This site serves to demonstrate my pursuit of understanding of things that interest me academically, professionally, and personally. Some of my\ncurrent interests are:\n\n- Algorithmic Trading\n- Reporting Automation\n- Principal Component Analysis\n- Web Scraping\n- High Powered Rocketry\n\nGood science is collaborative. Please do not hesitate to connect, my preferred contact methods are linked below.\n\n## Education\n\n- [**University of Alberta**](https://sites.ualberta.ca/~avdis/fin_honors/index.html) | Honors Finance (Fintech) | <span class=\"text-secondary-emphasis\">Present</span>\n\n## Experience\n\n- [**Auspice Capital Advisors**](https://www.auspicecapital.com/) | <span class=\"text-secondary-emphasis\"> May 2023 - Present</span>\n\n\n",
+    "supporting": [
+      "index_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

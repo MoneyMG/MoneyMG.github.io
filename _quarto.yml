@@ -1,0 +1,31 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Mitch Greer"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - text: "Professional"
+        menu:
+          - Rmonthies.qmd
+      - text: 'Academic'
+        menu: 
+          - about.qmd
+      - text: 'Personal'
+        menu:
+          - about.qmd  
+  page-footer: 
+      left: '© Copyright 2024, Mitch Greer'
+
+format:
+  html:
+    theme: simplex
+    css: styles.css
+    toc: false
+    
+
+editor: visual
+

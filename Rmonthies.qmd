@@ -1,0 +1,242 @@
+---
+title: "Commentary Visuals"
+format: html
+editor: visual
+---
+
+```{r}
+#| echo: false
+
+
+ausTheme_base <- function() {
+  ggplot2::theme(
+    panel.background = element_rect(fill = 'white'),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.y = element_line(colour = 'lightgrey'),
+    panel.grid.minor.y = element_line(colour = 'lightgrey'),
+    axis.ticks.y = element_blank(),
+    axis.ticks.x = element_line('lightgrey')
+    
+  )
+}
+```
+
+```{r}
+#| echo: false
+#| output: false
+
+
+library(dplyr)
+library(tidyquant)
+library(tidyr)
+library(ggplot2)
+```
+
+I work with smart people. Their time is better spent either communicating our strategies or developing products. Below is a sample of what I have done to aid in that goal. This R script connects to the back-end of a internal tool currently being improved and maintained by [Calum Sieppert](https://github.com/rynoV). For security reasons I have excluded the visuals that use the tool.
+
+```{r}
+#| echo: false
+#| warning: false
+
+data <- tidyquant::tq_get(x = "CPIAUCSL" ,
+                          get = "economic.data",
+                          from = "2019-01-01") %>%
+  dplyr::rename(., Series = price, Date = date) %>%
+  dplyr::mutate(.,
+                YOY = ((Series - lag(Series, n = 12)) / lag(Series, n = 12)) * 100) %>%
+  dplyr::transmute(., Date, Series, YOY)
+
+
+```
+
+```{r, CPI CHART}
+#| echo: false
+#| warning: false
+
+
+CPIvis <- data %>%
+  dplyr::filter(., Date >= '2020-04-01')
+
+min <- min(CPIvis$Date)
+max <- max(CPIvis$Date)
+
+cpi <- data %>% ggplot(aes(x = Date, y = YOY)) + 
+  geom_line(col = '#f5a800', size = 1.25) + 
+  scale_y_continuous(
+    breaks = c(0:10),
+    minor_breaks = c(0:10),
+    labels = scales::number_format(accuracy = 0.1),
+    limits = c(0.0, 10.0),
+    expand = c(0,0)
+                     ) + 
+  scale_x_date(
+    breaks = '4 months',
+    date_labels = '%Y-%m', 
+    limits = c(min, max), 
+    expand = c(0,10)
+    ) +
+  ausTheme_base() +
+  labs(
+    title = 'CONSUMER PRICE INDEX (CPI) YOY% CHANGE',
+    y = '',
+    x = ''
+  )
+
+cpi %>% 
+  plotly::ggplotly() %>% 
+  plotly::style(
+    hoverinfo = 'text',
+    hovertext = paste('YoY% :', round(CPIvis$YOY, 2),
+                      '<br>Date :', CPIvis$Date)
+    
+    )
+  
+  
+```
+
+I am currently working on creating downloadable HTML versions of the each [fund's](https://www.auspicecapital.com/resources#p2) commentary with intractability. Ultimately the goal is to have one touch point (i.e. the written component) firm side and increase the end users utility out of the commentary.
+
+::: panel-tabset
+## Sector Risk
+
+```{r, scrape for sector risk}
+#| echo: false
+#| warning: false
+#| output: false
+
+
+library(RSelenium)
+rD <- rsDriver(browser = 'firefox', chromever = NULL)
+remDR <- rD[['client']]
+
+remDR$navigate('https://www.auspicecapital.com/auspice-diversified-trust')
+
+Sys.sleep(2)
+
+page <- remDR$getPageSource()
+
+Sys.sleep(2)
+
+rvest::read_html(page[[1]]) %>% 
+  rvest::html_elements(css = 'table') %>%
+  rvest::html_table()
+
+ttinvestments <- rvest::read_html(page[[1]]) %>% 
+  rvest::html_elements(css = 'table') %>% 
+  .[[1]] %>% 
+  rvest::html_element(css = 'tbody') %>%
+  rvest::html_table()
+
+ttrisk <- rvest::read_html(page[[1]]) %>% 
+  rvest::html_elements(css = 'table') %>% 
+  .[[2]] %>% 
+  rvest::html_element(css = 'tbody') %>%
+  rvest::html_table()
+
+ttrisksector <- rvest::read_html(page[[1]]) %>% 
+  rvest::html_elements(css = 'table') %>% 
+  .[[3]] %>% 
+  rvest::html_element(css = 'tbody') %>%
+  rvest::html_table()
+
+historic <- rvest::read_html(page[[1]]) %>% 
+  rvest::html_elements(css = 'table') %>%
+  .[[4]] %>% 
+  rvest::html_table()
+
+seriesperf <- rvest::read_html(page[[1]]) %>% 
+  rvest::html_elements(css = 'table') %>%
+  .[[5]] %>% 
+  rvest::html_table()
+
+seriesdailynav <- rvest::read_html(page[[1]]) %>% 
+  rvest::html_elements(css = 'table') %>%
+  .[[6]] %>% 
+  rvest::html_table()
+
+remDR$close()
+rD[['server']]$stop()
+
+
+```
+
+```{r, Current Sector Risk}
+#| echo: false
+#| warning: false
+
+
+library(ggplot2)
+
+risksector <- ttrisksector %>%
+  dplyr::mutate(
+    int = stringr::str_replace_all(X2, '%', ''),
+    porp.port = as.numeric(int),
+    percentage = porp.port / sum(porp.port),
+    clean = stringr::str_replace_all(X1, ' and ', ' & '),
+    Sector = toupper(clean)) %>% 
+  dplyr::select(Sector, percentage) %>%
+  dplyr::mutate(color = ifelse(Sector %in% c("ENERGIES", "GRAINS", "METALS", "SOFTS"), '#f5a800', '#081F2D'))
+
+
+correctorder <- c("ENERGIES", "GRAINS", "METALS", "SOFTS" , "CURRENCIES", "EQUITIES", "RATES & CASH")
+
+risksector$Sector <- factor(risksector$Sector, levels = correctorder)
+
+risksector <- dplyr::arrange(risksector, Sector)
+
+riskvis <- risksector %>% ggplot() + 
+  geom_col(aes(x = Sector, y = percentage, fill = color), width = 0.4, position = position_dodge(width = 0.5)) +
+  scale_fill_identity() +
+  scale_y_continuous(
+    labels = scales::percent_format(accuracy = 1), 
+    limits = c(0, 0.35),
+    breaks = seq(0, 0.35, by = 0.05),
+    minor_breaks = NULL) +
+  theme(
+    text = element_text(family = 'sans-serif'),
+    panel.background = element_rect(fill = 'white'),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.y = element_line(colour = 'lightgrey'),
+    panel.grid.minor.y = element_line(colour = 'lightgrey'),
+    axis.ticks.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.x = element_text(angle = 90, size = 12, color = '#424242', vjust = 0.5, hjust = 1),
+    axis.text.y = element_text(size = 10, colour = '#424242')
+    
+  ) +
+  labs(
+    x = '',
+    y = ''
+  )
+  
+riskvis %>% 
+  plotly::ggplotly() %>% 
+  plotly::style(
+    showlegend = FALSE,
+    hoverinfo = 'y',
+    hovertemplate = "%{y:.2%} of Portfolio"
+)
+```
+
+## Monthly Performance
+
+```{r}
+#| echo: false
+
+historic %>% 
+  as_tibble() %>%
+  slice(1:18) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling(bootstrap_options = c('striped', 'hover'), full_width = F, position = 'center') %>%
+  kableExtra::row_spec(0, color = 'white', background = '#081F2D') %>% 
+  kableExtra::column_spec(2:13, background = '#f5a800', include_thead = T) %>% 
+  kableExtra::column_spec(2:13, background = 'inherit') %>%
+  kableExtra::column_spec(2:13, include_thead = T, border_left = '2px solid white', border_right = '2px solid white') %>% 
+  kableExtra::column_spec(1, bold = T) %>% 
+  kableExtra::column_spec(14, bold = T)
+  
+  
+```
+:::
