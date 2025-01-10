@@ -176,10 +176,10 @@ risksector <- ttrisksector %>%
     clean = stringr::str_replace_all(X1, ' and ', ' & '),
     Sector = toupper(clean)) %>% 
   dplyr::select(Sector, percentage) %>%
-  dplyr::mutate(color = ifelse(Sector %in% c("ENERGIES", "GRAINS", "METALS", "SOFTS"), '#f5a800', '#081F2D'))
+  dplyr::mutate(color = ifelse(Sector %in% c("ENERGIES", "GRAINS", "METALS", "SOFTS", "MEATS"), '#f5a800', '#081F2D'))
 
 
-correctorder <- c("ENERGIES", "GRAINS", "METALS", "SOFTS" , "CURRENCIES", "EQUITIES", "RATES & CASH")
+correctorder <- c("ENERGIES", "GRAINS", "METALS", "SOFTS" , "MEATS", "CURRENCIES", "EQUITIES", "RATES & CASH")
 
 risksector$Sector <- factor(risksector$Sector, levels = correctorder)
 
