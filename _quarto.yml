@@ -22,6 +22,7 @@ website:
 
 format:
   html:
+    embed-resources: true
     theme: simplex
     css: styles.css
     toc: false
