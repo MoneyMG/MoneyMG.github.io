@@ -1,0 +1,38 @@
+---
+title: Get to Know Me
+format: 
+  html: 
+    grid: 
+      body-width: 900px
+about:
+  template: broadside
+  image: Self.jpg
+  links: 
+    - icon: linkedin
+      text: Linkedin
+      href: https://www.linkedin.com/in/mitchelgreer/
+    - icon: github
+      text: Github
+      href: https://github.com/MoneyMG
+    - icon: envelope
+      text: Email
+      href: mailto::magreer@ualberta.ca
+---
+
+It is not enough to know the labels of the things that interest us. This site serves to demonstrate my pursuit of understanding of things that interest me academically, professionally, and personally. Some of my current interests are:
+
+-   Algorithmic Trading
+-   Reporting Automation
+-   Principal Component Analysis
+-   Web Scraping
+-   High Powered Rocketry
+
+Good science is collaborative. Please do not hesitate to connect, my preferred contact methods are linked below.
+
+## Education
+
+[**University of Alberta**](https://sites.ualberta.ca/~avdis/fin_honors/index.html) \| Honors Finance (Fintech) \| [Present]{.text-secondary-emphasis}
+
+## Experience
+
+[**Auspice Capital Advisors**](https://www.auspicecapital.com/) \| [May 2023 - Present]{.text-secondary-emphasis}
